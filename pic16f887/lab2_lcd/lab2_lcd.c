@@ -1,8 +1,6 @@
 //тактовая частота
 #define _XTAL_FREQ 4000000
-
 #include    <htc.h>
-
 #define    LCD_RS RA3
 #define    LCD_RW RA4
 #define    LCD_EN RA5
