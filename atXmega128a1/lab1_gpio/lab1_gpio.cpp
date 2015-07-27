@@ -1,5 +1,5 @@
 //константа F_CPU задает частоту тактирования
-#define F_CPU 20000000
+#define F_CPU 2000000
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -14,13 +14,13 @@ int main(void) {
 		if(PORTE.IN & 0b00100000){
 			//защита от дребезга контактов
 			while(PORTE.IN & 0b00100000);
-			_delay_ms(10);
+			_delay_ms(100);
 			dir = 1 - dir;
 		}
 		//переключение светодиода
 		if(dir)PORTE.OUT = 0b00011111;
 		else PORTE.OUT = 0b00000000;
 		//задержка
-		_delay_ms(10);
+		_delay_ms(100);
 	}
 }
