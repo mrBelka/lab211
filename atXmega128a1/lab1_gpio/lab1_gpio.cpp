@@ -16,11 +16,9 @@ int main(void) {
 			while(PORTE.IN & 0b00100000);
 			_delay_ms(100);
 			dir = 1 - dir;
+			//переключение светодиода
+			if(dir)PORTE.OUT = 0b00011111;
+			else PORTE.OUT = 0b00000000;
 		}
-		//переключение светодиода
-		if(dir)PORTE.OUT = 0b00011111;
-		else PORTE.OUT = 0b00000000;
-		//задержка
-		_delay_ms(100);
 	}
 }
