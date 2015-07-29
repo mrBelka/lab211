@@ -95,26 +95,38 @@ int main(void)
 
 void glcd_init(void)
 {
+	//перезагружаем контроллер
+	//ждем, пока питание будет стабильным
 	RST_Low();
 	_delay_ms(10);
 	RST_High();
 	_delay_ms(100);
 	
+	//отключаем оба контроллера
 	CS1_High();
 	CS2_High();
+	//отключаем дисплей
 	lcd_command(0x3e);    // display off
-	lcd_command(0x40);    // Y=0
-	lcd_command(0xb8);    // page=0
-	lcd_command(0xc0);    // display start line=0
-	lcd_command(0x3f);    // display on
+	//устанавливаем номер колонки равным 0
+	lcd_command(0x40);   
+	//устанавливаем номер страницы равным 0
+	lcd_command(0xb8);
+	//номер линии, начиная с которой данные будут отображаться на дисплее (если 0, то с самого начала, если 10, то 
+	//изображение будет смещено на 10 линий вверх, а его невлезшая часть отобразится снизу)
+	lcd_command(0xc0); 
+	//включаем дисплей
+	lcd_command(0x3f);
 }
 
 //---------------------------------------------------
-
+//отослать LCD-дисплею инструкцию
 void lcd_command(unsigned char command)
 {
+	//сигнал о том, что будем передавать инструкцию
 	RS_Low();
+	//отправляем инструкцию
 	lcd_data=command;
+	//стробирование
 	E_High();
 	_delay_us(10);
 	E_Low();
@@ -122,11 +134,14 @@ void lcd_command(unsigned char command)
 }
 
 //---------------------------------------------------
-
+//отослать LCD-дисплею данные
 void lcd_dataout(unsigned char data)
 {
+	//сигнал о том, что будем передавать данные
 	RS_High();
+	//отправляем данные
 	lcd_data=data;
+	//стробирование
 	E_High();
 	_delay_us(10);
 	E_Low();
@@ -134,7 +149,7 @@ void lcd_dataout(unsigned char data)
 }
 
 //---------------------------------------------------
-
+//выбираем страницу в левой части дисплея
 void set_page_left(unsigned char page)
 {
 	CS1_High();
@@ -143,7 +158,7 @@ void set_page_left(unsigned char page)
 }
 
 //---------------------------------------------------
-
+//выбираем страницу в правой части дисплея
 void set_page_right(unsigned char page)
 {
 	CS1_Low();
@@ -152,7 +167,7 @@ void set_page_right(unsigned char page)
 }
 
 //---------------------------------------------------
-
+//выбираем номер колонки в левой части дисплея
 void set_y_left(unsigned char y)
 {
 	CS1_High();
@@ -161,7 +176,7 @@ void set_y_left(unsigned char y)
 }
 
 //---------------------------------------------------
-
+//выбираем номер колонки в правой части дисплея
 void set_y_right(unsigned char y)
 {
 	CS1_Low();
