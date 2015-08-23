@@ -4,11 +4,6 @@
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_gpio.h"
 
-// максимальное количество принятых символов
-#define MAX_STRLEN 12
-// массив принятых символов
-volatile char received_string[MAX_STRLEN+1];
-
 void Delay(__IO uint32_t nCount) {
   while(nCount--) {
   }
@@ -54,7 +49,7 @@ void init_USART1(uint32_t baudrate){
 	USART_InitStruct.USART_Parity = USART_Parity_No;
 	// аппаратное управление потоком данных
 	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	// задаем, какую именно функцию выполняют пины
+	// указываем, как будет работать модуль: в данном случае, на прием и на передачу
 	USART_InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 	USART_Init(USART1, &USART_InitStruct);
 
@@ -77,15 +72,11 @@ void init_USART1(uint32_t baudrate){
 }
 
 // функция отправки данных
-void USART_puts(USART_TypeDef* USARTx, volatile char *s){
-
-	while(*s){
+void USART_putc(USART_TypeDef* USARTx, char s){
 		// ждем, пока предыдущие данные не отправятся
 		while( !(USARTx->SR & 0x00000040) );
 		// отправляем следующие
-		USART_SendData(USARTx, *s);
-		*s++;
-	}
+		USART_SendData(USARTx, s);
 }
 
 int main(void) {
@@ -99,18 +90,7 @@ int main(void) {
 // обработчик прерываний для всех прерываний связанных с UART1
 void USART1_IRQHandler(void){
 	// если установлен флаг прерывания по поступлению данных
-	if( USART_GetITStatus(USART1, USART_IT_RXNE) ){
-
-		static uint8_t cnt = 0;
-		char t = USART1->DR;
-
-		if((t != 'n') && (cnt < MAX_STRLEN)){
-			received_string[cnt] = t;
-			cnt++;
-		}
-		else{
-			cnt = 0;
-			USART_puts(USART1, received_string);
-		}
-	}
+	if( USART_GetITStatus(USART1, USART_IT_RXNE) )
+		USART_putc(USART1, USART1->DR);
 }
+
